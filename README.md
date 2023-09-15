@@ -3,6 +3,9 @@
 1. At project folder, run
 ```
 pip install streamlit
+pip install langchain
+pip install openai
+pip install PyPDF2
 ```
 
 2. cd into quizbot

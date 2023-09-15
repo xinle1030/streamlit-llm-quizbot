@@ -4,12 +4,37 @@ import openai
 import streamlit as st
 from get_quiz import get_quiz_from_data
 import test_data as td
+from PyPDF2 import PdfFileReader, PdfFileWriter,PdfReader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # Input box to enter the data of the quiz
-data = {'data': st.sidebar.text_input(
-    "To change data just enter in below. From next new quiz question the data entered here will be used.",
-    value=td.biology_notes,
-)}
+# data = {'data': st.sidebar.text_input(
+#     "To change data just enter in below. From next new quiz question the data entered here will be used.",
+#     value=td.biology_notes,
+# )}
+
+uploaded_file = st.sidebar.file_uploader("Upload Quiz Data", type="pdf")
+
+if uploaded_file is not None:
+    st.write(uploaded_file.name)
+    pdf_reader = PdfReader(uploaded_file)
+
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+
+    #langchain_textspliter
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size = 1000,
+        chunk_overlap = 200,
+        length_function = len
+    )
+
+    chunks = text_splitter.split_text(text=text)
+
+    store_name = uploaded_file.name[:-4]
+
+    data = chunks
 
 api_key = st.sidebar.text_input("OpenAI API key", type="password").strip()
 
